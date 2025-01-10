@@ -15,6 +15,15 @@ export class Property extends Document {
   @Prop({ required: true })
   propertyType: string;
 
+  @Prop({ required: true })
+  city: string;
+
+  @Prop({ required: true })
+  state: string;
+
+  @Prop({ required: true })
+  area: string;
+
   @Prop({ default: new Date() })
   createdAt: Date;
 }
