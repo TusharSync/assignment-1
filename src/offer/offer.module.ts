@@ -12,10 +12,13 @@ import { RolesGuard } from '../user/roles.guard';
   imports: [
     MongooseModule.forFeature([{ name: Offer.name, schema: OfferSchema }]),
     BullModule.forRoot({
-      connection: {
+      redis: {
         host: 'localhost',
-        port: 5672, // RabbitMQ default port
+        port: 6379, // Redis default port
       },
+    }),
+    BullModule.registerQueue({
+      name: 'offerQueue',
     }),
     PropertyModule,
     EmailModule,

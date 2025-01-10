@@ -1,3 +1,4 @@
+// Updated Property Schema
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -26,6 +27,9 @@ export class Property extends Document {
 
   @Prop({ default: new Date() })
   createdAt: Date;
+
+  @Prop({ required: false })
+  templateUrl: string; // Field to store the PDF template URL
 }
 
 export const PropertySchema = SchemaFactory.createForClass(Property);

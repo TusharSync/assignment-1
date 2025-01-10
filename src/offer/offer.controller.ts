@@ -23,13 +23,7 @@ export class OfferController {
     const pdfBuffer = await this.offerService.generateOfferPDF(body);
 
     // Save offer to database
-    const newOffer = new this.offerService.offerModel({
-      propertyId: body.propertyId,
-      buyerName: body.buyerName,
-      buyerEmail: body.buyerEmail,
-      offerAmount: body.offerAmount,
-    });
-    const savedOffer = await newOffer.save();
+    const savedOffer = await this.offerService.saveOffer(body);
 
     // Send email with PDF
     await this.offerService.sendEmailWithSMTP(
