@@ -16,14 +16,19 @@ export class UserService {
     email: string,
     password: string,
     name: string,
-    role: string = 'user',
+    city: string,
+    state: string,
+    area: string,
   ): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new this.userModel({
       email,
       password: hashedPassword,
       name,
-      role,
+      city,
+      state,
+      area,
+      role: 'user',
     });
     return user.save();
   }
@@ -37,7 +42,14 @@ export class UserService {
   }
 
   async login(user: User): Promise<{ accessToken: string }> {
-    const payload = { email: user.email, sub: user._id, role: user.role };
+    const payload = {
+      email: user.email,
+      sub: user._id,
+      role: user.role,
+      city: user.city,
+      state: user.state,
+      area: user.area,
+    };
     return {
       accessToken: this.jwtService.sign(payload),
     };

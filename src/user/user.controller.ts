@@ -12,14 +12,18 @@ export class UserController {
       email: string;
       password: string;
       name: string;
-      role?: string;
+      city: string;
+      state: string;
+      area: string;
     },
   ) {
     return this.userService.register(
       body.email,
       body.password,
       body.name,
-      body.role,
+      body.city,
+      body.state,
+      body.area,
     );
   }
 
