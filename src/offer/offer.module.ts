@@ -1,30 +1,20 @@
 import { Module } from '@nestjs/common';
 import { OfferService } from './offer.service';
-import { OfferController } from './offer.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Offer, OfferSchema } from './schemas/offer.schema';
-import { BullModule } from '@nestjs/bull';
-import { PropertyModule } from '../property/property.module';
 import { EmailModule } from '../email/email.module';
-import { RolesGuard } from '../user/roles.guard';
+import { FileService } from '../file/file.service';
+import { QueueService } from './queue.service';
+import { EmailService } from './email.service';
+import { Property,PropertySchema } from '../property/schemas/property.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Offer.name, schema: OfferSchema }]),
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379, // Redis default port
-      },
-    }),
-    BullModule.registerQueue({
-      name: 'offerQueue',
-    }),
-    PropertyModule,
+    MongooseModule.forFeature([{ name: Offer.name, schema: OfferSchema },{ name: Property.name, schema: PropertySchema }]),
     EmailModule,
   ],
-  controllers: [OfferController],
-  providers: [OfferService, RolesGuard],
+  controllers: [],
+  providers: [OfferService, QueueService, EmailService, FileService],
   exports: [OfferService],
 })
-export class OfferModule {}
+export class OfferModule { }

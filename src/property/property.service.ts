@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Property } from './schemas/property.schema';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class PropertyService {
   constructor(
     @InjectModel(Property.name) private propertyModel: Model<Property>,
-  ) {}
+    private fileService: FileService, // Injecting FileService
+  ) { }
 
   async createProperty(
     title: string,
@@ -17,6 +19,7 @@ export class PropertyService {
     city: string,
     state: string,
     area: string,
+    templateUrl: string,
   ): Promise<Property> {
     const property = new this.propertyModel({
       title,
@@ -26,9 +29,19 @@ export class PropertyService {
       city,
       state,
       area,
+      templateUrl,
     });
     return property.save();
   }
+  async uploadTemplate(file: any): Promise<string> {
+    try {
+      const fileName = `template-${Date.now()}-${file.originalname}`;
+      return await this.fileService.uploadPDF(fileName, file.buffer);
+    } catch (error) {
+      throw new Error('Failed to upload template');
+    }
+  }
+
 
   async getAllProperties(): Promise<Property[]> {
     return this.propertyModel.find().exec();

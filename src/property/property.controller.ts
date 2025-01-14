@@ -9,6 +9,8 @@ import {
   Query,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { PropertyService } from './property.service';
 import { Property } from './schemas/property.schema';
@@ -16,6 +18,7 @@ import { JwtAuthGuard } from '../user/jwt-auth.guard';
 import { RolesGuard } from '../user/roles.guard';
 import { Roles } from '../user/roles.decorator';
 import { Request } from 'express';
+import { FileUploadInterceptor } from '../file/file.interceptor';
 
 @Controller('property')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -24,6 +27,7 @@ export class PropertyController {
 
   @Post('create')
   @Roles('admin')
+  @UseInterceptors(FileUploadInterceptor)
   async createProperty(
     @Body()
     body: {
@@ -35,7 +39,9 @@ export class PropertyController {
       state: string;
       area: string;
     },
+    @UploadedFile() file: any,
   ): Promise<Property> {
+    const templateUrl = await this.propertyService.uploadTemplate(file);
     return this.propertyService.createProperty(
       body.title,
       body.price,
@@ -44,6 +50,7 @@ export class PropertyController {
       body.city,
       body.state,
       body.area,
+      templateUrl,
     );
   }
 

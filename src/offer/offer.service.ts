@@ -1,17 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Queue, Worker } from 'bullmq';
+import { Job, Queue, Worker } from 'bullmq';
 import { Offer } from './schemas/offer.schema';
 import { Property } from '../property/schemas/property.schema';
 import * as PDFDocument from 'pdfkit';
-import { FileService } from './file.service';
+import { FileService } from '../file/file.service';
 import { EmailService } from './email.service';
 import { QueueService } from './queue.service';
 
 @Injectable()
-export class OfferService {
+export class OfferService implements OnModuleInit {
   private offerQueue: Queue;
+  private offerWorker: Worker | null = null; // Track the worker
+
 
   constructor(
     @InjectModel(Offer.name) private offerModel: Model<Offer>,
@@ -23,6 +25,21 @@ export class OfferService {
     this.offerQueue = this.queueService.createQueue('offerQueue');
   }
 
+  async onModuleInit() {
+    console.log('Initializing OfferService...');
+    await this.scheduleDailyOfferJob(); // Schedule daily job
+    this.processOfferJobs(); // Start processing jobs
+    console.log('OfferService initialized and job scheduled at 12:00 AM');
+  }
+
+
+  async onModuleDestroy() {
+    // Gracefully stop the worker on shutdown
+    if (this.offerWorker) {
+      await this.offerWorker.close();
+      console.log('OfferWorker stopped.');
+    }
+  }
   async uploadTemplatePDF(
     fileName: string,
     buffer: Buffer,
@@ -58,7 +75,7 @@ export class OfferService {
 
     const buffers: Buffer[] = [];
     doc.on('data', buffers.push.bind(buffers));
-    doc.on('end', () => {});
+    doc.on('end', () => { });
 
     doc.end();
 
@@ -76,91 +93,85 @@ export class OfferService {
     return pdfUrl;
   }
 
-  async saveOffer(offerData: {
-    buyerName: string;
-    propertyId: string;
-    offerAmount: number;
-    buyerEmail: string;
-    pdfUrl: string;
-  }): Promise<Offer> {
-    const newOffer = new this.offerModel({
-      propertyId: offerData.propertyId,
-      buyerName: offerData.buyerName,
-      buyerEmail: offerData.buyerEmail,
-      offerAmount: offerData.offerAmount,
-      pdfUrl: offerData.pdfUrl,
-    });
-    return newOffer.save();
-  }
-
   async scheduleDailyOfferJob(): Promise<void> {
-    await this.offerQueue.add(
-      'generateOffers',
-      {},
-      { repeat: { pattern: '0 0 * * *' } },
-    );
+    await this.offerQueue.add('generateOffers', {}, {
+      repeat: { pattern: '0 0 * * *' }, // Use `pattern` instead of `cron`
+    });
+    console.log('Daily Offer Job scheduled.');
   }
-
-  async processOffers(): Promise<void> {
-    new Worker(
+  async processOfferJobs(): Promise<void> {
+    this.offerWorker = new Worker(
       'offerQueue',
-      async (job: any) => {
-        console.log(job);
-        const users = await this.fetchAllUsers();
-        for (const user of users) {
-          const properties = await this.fetchPropertiesForUser(user);
-          for (const property of properties) {
-            const templateUrl = property.templateUrl;
+      async (job: Job) => {
+        console.log(`Processing job ${job.id} of type ${job.name}`);
+        try {
+          const users = await this.fetchAllUsers();
+          for (const user of users) {
+            const properties = await this.fetchPropertiesForUser(user);
+            for (const property of properties) {
+              if (!property.templateUrl) {
+                console.error(`No template found for property: ${property._id}`);
+                continue;
+              }
 
-            if (!templateUrl) {
-              console.error(`Template not found for property ${property._id}`);
-              continue;
-            }
+              const pdfUrl = await this.generateOfferPDF({
+                buyerName: user.name,
+                propertyId: property._id,
+                offerAmount: property.price,
+                templateUrl: property.templateUrl,
+              });
 
-            const pdfUrl = await this.generateOfferPDF({
-              buyerName: user.name,
-              propertyId: property._id,
-              offerAmount: property.price,
-              templateUrl,
-            });
+              await this.saveOffer({
+                buyerName: user.name,
+                buyerEmail: user.email,
+                propertyId: property._id,
+                offerAmount: property.price,
+                pdfUrl,
+              });
 
-            // Update email chain in property schema
-            await this.propertyModel.updateOne(
-              { _id: property._id },
-              {
-                $push: {
-                  emailChains: {
-                    userId: user._id,
-                    pdfUrl,
-                    sentAt: new Date(),
-                    additionalDetails: {
-                      buyerName: user.name,
-                      offerAmount: property.price,
-                    },
-                  },
-                },
-              },
-            );
-
-            try {
               await this.emailService.sendEmail(
                 user.email,
                 'Your Property Offer',
-                'Here is your offer.',
+                `Dear ${user.name}, please find your offer attached.`,
                 pdfUrl,
               );
-            } catch (error) {
-              console.error(
-                `Failed to send offer email to ${user.email}: ${error.message}`,
-              );
+
+              console.log(`Offer sent to ${user.email} for property ${property._id}`);
             }
           }
+        } catch (error) {
+          console.error(`Error processing job ${job.id}:`, error.message);
+          throw error; // Allow BullMQ to handle retries
         }
       },
-      {
-        connection: this.queueService.getConnectionOptions(),
-      },
+      { connection: this.queueService.getConnectionOptions() },
     );
+
+    this.offerWorker.on('completed', (job) => {
+      console.log(`Job ${job.id} of type ${job.name} completed successfully.`);
+    });
+
+    this.offerWorker.on('failed', (job, error) => {
+      console.error(`Job ${job?.id} of type ${job?.name} failed:`, error.message);
+    });
+  }
+
+
+  async saveOffer(data: {
+    buyerName: string;
+    buyerEmail: string;
+    propertyId: string;
+    offerAmount: number;
+    pdfUrl: string;
+  }): Promise<Offer> {
+    const offer = new this.offerModel({
+      propertyId: data.propertyId,
+      buyerName: data.buyerName,
+      buyerEmail: data.buyerEmail,
+      offerAmount: data.offerAmount,
+      emailChain: [],
+    });
+    return offer.save();
   }
 
   private async fetchAllUsers(): Promise<any[]> {

@@ -6,6 +6,7 @@ import { EmailModule } from './email/email.module';
 import { NotificationModule } from './notification/notification.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { OfferModule } from './offer/offer.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { OfferModule } from './offer/offer.module';
     NotificationModule,
     AnalyticsModule,
     OfferModule,
+    FileModule,
   ],
 })
 export class AppModule {}
