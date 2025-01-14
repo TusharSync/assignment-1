@@ -47,7 +47,7 @@ export class PropertyService {
     return this.propertyModel.find().exec();
   }
 
-  async getPropertyById(id: string): Promise<Property> {
+  async getPropertyById(id: string): Promise<Property | null> {
     return this.propertyModel.findById(id).exec();
   }
 
@@ -59,7 +59,7 @@ export class PropertyService {
     state?: string;
     area?: string;
   }): Promise<Property[]> {
-    const query = {};
+    const query: any = {};
     if (filters.price) {
       query['price'] = { $lte: filters.price };
     }
@@ -84,13 +84,13 @@ export class PropertyService {
   async updateProperty(
     id: string,
     updateData: Partial<Property>,
-  ): Promise<Property> {
+  ): Promise<Property | null> {
     return this.propertyModel
       .findByIdAndUpdate(id, updateData, { new: true })
       .exec();
   }
 
-  async deleteProperty(id: string): Promise<Property> {
+  async deleteProperty(id: string): Promise<Property | null> {
     return this.propertyModel.findByIdAndDelete(id).exec();
   }
 

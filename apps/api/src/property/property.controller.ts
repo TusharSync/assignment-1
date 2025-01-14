@@ -60,7 +60,7 @@ export class PropertyController {
   }
 
   @Get(':id')
-  async getPropertyById(@Param('id') id: string): Promise<Property> {
+  async getPropertyById(@Param('id') id: string): Promise<Property|null> {
     return this.propertyService.getPropertyById(id);
   }
 
@@ -85,7 +85,7 @@ export class PropertyController {
   }
 
   @Get('neighborhood-level')
-  async getNeighborhoodLevelDetails(@Req() req: Request): Promise<any> {
+  async getNeighborhoodLevelDetails(@Req() req: any): Promise<any> {
     const user = req.user as { city: string; state: string; area: string };
     return this.propertyService.getNeighborhoodLevelDetails(
       user.city,
@@ -114,13 +114,13 @@ export class PropertyController {
   async updateProperty(
     @Param('id') id: string,
     @Body() updateData: Partial<Property>,
-  ): Promise<Property> {
+  ): Promise<Property|null> {
     return this.propertyService.updateProperty(id, updateData);
   }
 
   @Delete(':id')
   @Roles('admin')
-  async deleteProperty(@Param('id') id: string): Promise<Property> {
+  async deleteProperty(@Param('id') id: string): Promise<Property|null> {
     return this.propertyService.deleteProperty(id);
   }
 }
