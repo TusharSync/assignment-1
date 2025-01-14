@@ -10,7 +10,7 @@ export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(
     email: string,
@@ -22,12 +22,12 @@ export class UserService {
   ): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new this.userModel({
-      email,
+      email: email,
       password: hashedPassword,
-      name,
-      city,
-      state,
-      area,
+      name: name,
+      city: city,
+      state: state,
+      area: area,
       role: 'user',
     });
     return user.save();

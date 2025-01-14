@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Job, Queue, Worker } from 'bullmq';
 import { Offer } from './schemas/offer.schema';
 import { Property } from '../property/schemas/property.schema';
-import * as PDFDocument from 'pdfkit';
+import  PDFDocument from 'pdfkit';
 import { FileService } from '../file/file.service';
 import { EmailService } from './email.service';
 import { QueueService } from './queue.service';
@@ -61,9 +61,13 @@ export class OfferService implements OnModuleInit {
     offerAmount: number;
     templateUrl: string;
   }): Promise<string> {
-    const templateBuffer = await this.fileService.downloadPDF(
+    await this.fileService.downloadPDF(
       offerData.templateUrl,
     );
+
+    // const templateBuffer = await this.fileService.downloadPDF(
+    //   offerData.templateUrl,
+    // );
 
     const doc = new PDFDocument({
       autoFirstPage: false,
@@ -140,7 +144,7 @@ export class OfferService implements OnModuleInit {
             }
           }
         } catch (error) {
-          console.error(`Error processing job ${job.id}:`, error.message);
+          console.error(`Error processing job ${job.id}:`, error);
           throw error; // Allow BullMQ to handle retries
         }
       },

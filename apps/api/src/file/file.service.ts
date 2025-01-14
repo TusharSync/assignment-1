@@ -1,20 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import * as Minio from 'minio';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class FileService {
   private fileClient: Minio.Client;
   private bucketName: string;
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     this.fileClient = new Minio.Client({
-      endPoint: 'localhost',
-      port: 9000,
+      endPoint: this.configService.get<string>('AWS_ENDPOINT') ?? "localhost",
+      port: this.configService.get<number>('AWS_PORT'),
       useSSL: false,
-      accessKey: 'minioadmin',
-      secretKey: 'minioadmin',
+      accessKey: this.configService.get<string>('AWS_ACCESS_KEY'),
+      secretKey: this.configService.get<string>('AWS_SECRET_KEY'),
     });
-    this.bucketName = 'offers';
+    this.bucketName = this.configService.get<string>('AWS_BUCKET_NAME') ?? "dev";
   }
 
   async uploadPDF(fileName: string, buffer: Buffer): Promise<string> {
@@ -28,7 +29,7 @@ export class FileService {
 
   async downloadPDF(fileUrl: string): Promise<Buffer> {
     const objectName = fileUrl.split('/').slice(4).join('/');
-  
+
     return new Promise<Buffer>((resolve, reject) => {
       const chunks: Buffer[] = [];
       this.fileClient.getObject(this.bucketName, objectName)

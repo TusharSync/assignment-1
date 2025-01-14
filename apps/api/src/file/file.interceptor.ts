@@ -14,6 +14,8 @@ export class FileUploadInterceptor implements NestInterceptor {
   private upload = multer({
     storage: multer.memoryStorage(), // In-memory storage
     fileFilter: (req, file, callback) => {
+      console.log("999999999999999999999999999999");
+      
       // Validate the file type
       if (file.mimetype !== 'application/pdf') {
         throw new HttpException('Only PDF files are allowed', HttpStatus.BAD_REQUEST)

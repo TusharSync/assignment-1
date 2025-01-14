@@ -1,55 +1,75 @@
-version: '3.9'
+# version: '3.9'
+
+# services:
+#   api:
+#     build:
+#       context: .
+#       dockerfile: app/api/Dockerfile
+#     volumes:
+#       - ./dist/api:/usr/src/app/dist
+#       - ./node_modules:/usr/src/app/node_modules
+#     ports:
+#       - "3000:3000"
+#     environment:
+#       - NODE_ENV=production
+#     networks:
+#       - app-network
+#   redis:
+#     image: redis:alpine
+#     ports:
+#       - "6379:6379"
+#     volumes:
+#       - redis-data:/data
+#     networks:
+#       - app-network
+
+#   mongodb:
+#     image: mongo:5.0
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - mongo-data:/data/db
+#     networks:
+#       - app-network
+
+#   minio:
+#     image: minio/minio
+#     command: server /data --console-address ":9001"
+#     environment:
+#       MINIO_ROOT_USER: minioadmin
+#       MINIO_ROOT_PASSWORD: minioadmin
+#     ports:
+#       - "9000:9000"
+#       - "9001:9001"
+#     volumes:
+#       - minio-data:/data
+#     networks:
+#       - app-network
+
+# volumes:
+#   redis-data:
+#   mongo-data:
+#   minio-data:
+
+# networks:
+#   app-network:
+
+
+version: '3.8'
 
 services:
-  api:
-    build:
-      context: .
-      dockerfile: app/api/Dockerfile
-    volumes:
-      - ./dist/api:/usr/src/app/dist
-      - ./node_modules:/usr/src/app/node_modules
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    networks:
-      - app-network
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    networks:
-      - app-network
-
-  mongodb:
-    image: mongo:5.0
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    networks:
-      - app-network
-
   minio:
-    image: minio/minio
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+    image: minio/minio:latest
+    container_name: minio
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9000:9000" # MinIO Console
+      - "9001:9001" # MinIO Admin Console
     volumes:
-      - minio-data:/data
-    networks:
-      - app-network
+      - ./minio-data:/data # Bind mount for MinIO data
+      - ./config:/root/.minio # Bind mount for MinIO configuration
+    environment:
+      MINIO_ROOT_USER: "admin" # Set your MinIO access key
+      MINIO_ROOT_PASSWORD: "admin@1234" # Set your MinIO secret key
+    command: server /data --console-address ":9001"
 
-volumes:
-  redis-data:
-  mongo-data:
-  minio-data:
 
-networks:
-  app-network:
