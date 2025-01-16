@@ -1,0 +1,11 @@
+.tableHeader {
+    background-color: var(--mui-primary-color); /* Use a CSS variable or theme color */
+    color: white;
+    font-weight: bold;
+  }
+  
+  .tableCell {
+    color: white;
+    font-weight: bold;
+  }
+  

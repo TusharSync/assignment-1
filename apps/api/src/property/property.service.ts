@@ -8,8 +8,8 @@ import { FileService } from '../file/file.service';
 export class PropertyService {
   constructor(
     @InjectModel(Property.name) private propertyModel: Model<Property>,
-    private fileService: FileService, // Injecting FileService
-  ) { }
+    private fileService: FileService // Injecting FileService
+  ) {}
 
   async createProperty(
     title: string,
@@ -19,7 +19,7 @@ export class PropertyService {
     city: string,
     state: string,
     area: string,
-    templateUrl: string,
+    templateUrl: string
   ): Promise<Property> {
     const property = new this.propertyModel({
       title,
@@ -42,7 +42,6 @@ export class PropertyService {
     }
   }
 
-
   async getAllProperties(): Promise<Property[]> {
     return this.propertyModel.find().exec();
   }
@@ -58,7 +57,7 @@ export class PropertyService {
     city?: string;
     state?: string;
     area?: string;
-  }): Promise<Property[]> {
+  }): Promise<Property[]> {   
     const query: any = {};
     if (filters.price) {
       query['price'] = { $lte: filters.price };
@@ -83,7 +82,7 @@ export class PropertyService {
 
   async updateProperty(
     id: string,
-    updateData: Partial<Property>,
+    updateData: Partial<Property>
   ): Promise<Property | null> {
     return this.propertyModel
       .findByIdAndUpdate(id, updateData, { new: true })
@@ -108,7 +107,7 @@ export class PropertyService {
   async getNeighborhoodLevelDetails(
     city: string,
     state: string,
-    area: string,
+    area: string
   ): Promise<any> {
     return this.propertyModel
       .aggregate([
@@ -128,7 +127,7 @@ export class PropertyService {
     const NPV = (rate: number) =>
       cashFlows.reduce(
         (acc, cashFlow, i) => acc + cashFlow / Math.pow(1 + rate, i),
-        0,
+        0
       );
     let rate = 0.1; // Initial guess
     for (let i = 0; i < 100; i++) {
@@ -141,7 +140,7 @@ export class PropertyService {
 
   async calculateCapRate(
     propertyValue: number,
-    netOperatingIncome: number,
+    netOperatingIncome: number
   ): Promise<number> {
     return (netOperatingIncome / propertyValue) * 100;
   }

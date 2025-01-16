@@ -23,6 +23,9 @@ export class User extends Document {
 
   @Prop({ required: true })
   area: string;
+
+  @Prop({ required: false, default: false })
+  isLoggedIn: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

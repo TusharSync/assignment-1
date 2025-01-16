@@ -72,6 +72,10 @@
     "apps/**"
   ],
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.0",
+    "@mui/material": "^6.4.0",
     "@nestjs/bull": "^10.2.3",
     "@nestjs/common": "^10.0.2",
     "@nestjs/config": "^3.3.0",
@@ -80,13 +84,15 @@
     "@nestjs/mongoose": "^10.1.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.2",
+    "@nestjs/swagger": "^8.1.1",
     "amqplib": "^0.10.5",
-    "axios": "^1.6.0",
+    "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "bull": "^4.16.5",
     "bullmq": "^5.34.8",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "express-basic-auth": "^1.2.1",
     "jsonwebtoken": "^9.0.2",
     "minio": "^8.0.3",
     "mongoose": "^8.9.4",
@@ -98,10 +104,13 @@
     "pdfkit": "^0.16.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-hook-form": "^7.54.2",
     "react-is": "18.3.1",
     "react-router-dom": "6.11.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
-    "styled-components": "5.3.6"
+    "styled-components": "5.3.6",
+    "swagger-ui-express": "^5.0.1",
+    "zustand": "^5.0.3"
   }
 }
