@@ -40,6 +40,8 @@ export class PropertyController {
     },
     @UploadedFile() file: any,
   ): Promise<Property> {
+    console.log(body,"xxxxxxxxxxxxxxxxxxxxx");
+    
     const templateUrl = await this.propertyService.uploadTemplate(file);
     return this.propertyService.createProperty(
       body.title,
