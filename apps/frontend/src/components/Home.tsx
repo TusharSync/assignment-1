@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import Filters from './property/Filters';
 import PropertyGrid from './property/PropertyGrid';
 import { usePropertyFetchAndFilterStore } from '../store/propertyStore';
+import FinancialCalculator from './FinancialCalculator';
 
 const HomePage: React.FC = () => {
   const { fetchProperties } = usePropertyFetchAndFilterStore();
@@ -17,6 +18,7 @@ const HomePage: React.FC = () => {
         Home
       </Typography>
       <Filters />
+      <FinancialCalculator />
       <PropertyGrid />
     </Box>
   );
