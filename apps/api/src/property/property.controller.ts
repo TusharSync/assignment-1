@@ -118,6 +118,7 @@ export class PropertyController {
   }
 
   @Get(':id/offers')
+  @Roles('admin')
   @ApiOperation({ summary: 'Get all offers for a property' })
   @ApiParam({ name: 'id', description: 'ID of the property' })
   @ApiResponse({
@@ -143,6 +144,7 @@ export class PropertyController {
   }
 
   @Get('offer/:id/email-thread')
+  @Roles('admin')
   @ApiOperation({ summary: 'Get the entire email thread for a specific offer' })
   @ApiParam({ name: 'id', description: 'ID of the offer' })
   @ApiResponse({
@@ -175,6 +177,7 @@ export class PropertyController {
     return await this.offerService.getEmailThread(offerId);
   }
   @Get(':id')
+  @Roles('admin')
   @ApiOperation({ summary: 'Get a property by ID' })
   @ApiParam({
     name: 'id',

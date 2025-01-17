@@ -70,8 +70,14 @@ function App() {
             path="/admin"
             element={<ProtectedAdminRoute element={<AdminHome />} />}
           />
-          <Route path="/property/:id" element={<PropertyDetailsPage />} />
-          <Route path="/offer/:id/email-thread" element={<EmailThreadPage />} />
+          <Route
+            path="/property/:id"
+            element={<ProtectedAdminRoute element={<PropertyDetailsPage />} />}
+          />
+          <Route
+            path="/offer/:id/email-thread"
+            element={<ProtectedAdminRoute element={<EmailThreadPage />} />}
+          />
         </Routes>
       </Router>
     </ThemeProvider>
