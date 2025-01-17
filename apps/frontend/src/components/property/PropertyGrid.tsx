@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Card, CardContent, Typography, CardMedia } from '@mui/material';
+import { Grid, Card, CardContent, Typography, Box } from '@mui/material';
 import { usePropertyFetchAndFilterStore } from '../../store/propertyStore';
 const PropertyGrid: React.FC = () => {
   const { properties } = usePropertyFetchAndFilterStore();

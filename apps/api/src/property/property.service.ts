@@ -68,8 +68,6 @@ export class PropertyService {
       return this.getMarketLevelDetails(low, high);
     }
     if (filters?.neighborhoodLevel === 'true') {
-      console.log(user);
-
       return this.getNeighborhoodLevelDetails(user.city, user.state, user.area);
     }
     const query: any = {};

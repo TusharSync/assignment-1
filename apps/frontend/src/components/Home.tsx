@@ -14,12 +14,23 @@ const HomePage: React.FC = () => {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <Typography variant="h4" gutterBottom>
-        Home
-      </Typography>
-      <Filters />
       <FinancialCalculator />
-      <PropertyGrid />
+      <Box
+        sx={{
+          padding: 3,
+          marginTop: 4,
+          border: '1px solid #ccc',
+          borderRadius: '8px',
+          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
+          backgroundColor: '#ffffff',
+        }}
+      >
+        <Typography variant="h5" gutterBottom>
+          Properties
+        </Typography>
+        <Filters />
+        <PropertyGrid />
+      </Box>
     </Box>
   );
 };

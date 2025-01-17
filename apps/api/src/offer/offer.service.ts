@@ -240,7 +240,6 @@ export class OfferService implements OnModuleInit {
           if (job) {
             console.error(`Error processing job ${job.id}:`, error);
           }
-          console.log(error, 'errorxxxxx');
           throw error; // Allow BullMQ to handle retries
         }
       },
