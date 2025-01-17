@@ -23,7 +23,6 @@ type Property = {
   city: string;
   state: string;
   area: string;
-  templateUrl?: string;
 };
 
 type Filter = {
@@ -33,6 +32,10 @@ type Filter = {
   city?: string;
   state?: string;
   area?: string;
+  marketLevel?: boolean;
+  neighborhoodLevel?: boolean;
+  low?: number;
+  high?: number;
 };
 
 type PropertyFetchAndFilterStore = {
@@ -58,7 +61,7 @@ export const usePropertyFetchAndFilterStore =
             .map(([key, value]) => [key, value.toString()])
         ).toString();
 
-        const response = await listAndFilterProperties(queryParams);
+        const {data:response} = await listAndFilterProperties(queryParams);
         set({ properties: response.data });
       } catch (error) {
         console.error('Failed to fetch properties:', error);

@@ -5,16 +5,20 @@ import { Offer, OfferSchema } from './schemas/offer.schema';
 import { EmailModule } from '../email/email.module';
 import { FileService } from '../file/file.service';
 import { QueueService } from './queue.service';
-import { EmailService } from './email.service';
-import { Property,PropertySchema } from '../property/schemas/property.schema';
+import { Property, PropertySchema } from '../property/schemas/property.schema';
+import { User, UserSchema } from '../user/schemas/user.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Offer.name, schema: OfferSchema },{ name: Property.name, schema: PropertySchema }]),
+    MongooseModule.forFeature([
+      { name: Offer.name, schema: OfferSchema },
+      { name: Property.name, schema: PropertySchema },
+      { name: User.name, schema: UserSchema },
+    ]),
     EmailModule,
   ],
   controllers: [],
-  providers: [OfferService, QueueService, EmailService, FileService],
+  providers: [OfferService, QueueService, FileService],
   exports: [OfferService],
 })
-export class OfferModule { }
+export class OfferModule {}

@@ -20,7 +20,6 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
-  ApiQuery,
   ApiConsumes,
   ApiBearerAuth,
 } from '@nestjs/swagger';
@@ -99,15 +98,20 @@ export class PropertyController {
     );
   }
 
-  // @Get('all')
-  // @ApiOperation({ summary: 'Get all properties' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'List of properties retrieved successfully',
-  // })
-  // async getAllProperties(): Promise<Property[]> {
-  //   return this.propertyService.getAllProperties();
-  // }
+  @Get('all')
+  @ApiOperation({ summary: 'Get all properties with filters' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of properties retrieved successfully',
+  })
+  async getAllProperties(
+    @Req() req: any,
+    @Query()
+    filters: PropertyListQuery
+  ): Promise<Property[]> {
+    const user = req.user as { city: string; state: string; area: string };
+    return this.propertyService.filterProperties({ ...filters, user });
+  }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a property by ID' })
@@ -121,46 +125,6 @@ export class PropertyController {
   @ApiResponse({ status: 404, description: 'Property not found' })
   async getPropertyById(@Param('id') id: string): Promise<Property | null> {
     return this.propertyService.getPropertyById(id);
-  }
-
-  @Get('list')
-  @ApiOperation({ summary: 'Filter properties based on criteria' })
-  @ApiResponse({
-    status: 200,
-    description: 'Filtered properties retrieved successfully',
-  })
-  async filterProperties(
-    @Query()
-    filters: PropertyListQuery
-  ): Promise<Property[]> {
-    return this.propertyService.filterProperties(filters);
-  }
-
-  @Get('market-level')
-  @ApiOperation({ summary: 'Get market-level details' })
-  @ApiResponse({
-    status: 200,
-    description: 'Market-level details retrieved successfully',
-  })
-  async getMarketLevelDetails(): Promise<any> {
-    return this.propertyService.getMarketLevelDetails();
-  }
-
-  @Get('neighborhood-level')
-  @ApiOperation({
-    summary: 'Get neighborhood-level details for the authenticated user',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Neighborhood-level details retrieved successfully',
-  })
-  async getNeighborhoodLevelDetails(@Req() req: any): Promise<any> {
-    const user = req.user as { city: string; state: string; area: string };
-    return this.propertyService.getNeighborhoodLevelDetails(
-      user.city,
-      user.state,
-      user.area
-    );
   }
 
   @Post('calculate-irr')

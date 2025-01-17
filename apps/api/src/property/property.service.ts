@@ -57,7 +57,21 @@ export class PropertyService {
     city?: string;
     state?: string;
     area?: string;
-  }): Promise<Property[]> {   
+    marketLevel?: string;
+    low?: number;
+    high?: number;
+    neighborhoodLevel?: string;
+    user?: any;
+  }): Promise<Property[]> {
+    const { user, low, high } = filters;
+    if (filters?.marketLevel === 'true' && low && high) {
+      return this.getMarketLevelDetails(low, high);
+    }
+    if (filters?.neighborhoodLevel === 'true') {
+      console.log(user);
+
+      return this.getNeighborhoodLevelDetails(user.city, user.state, user.area);
+    }
     const query: any = {};
     if (filters.price) {
       query['price'] = { $lte: filters.price };
@@ -93,33 +107,31 @@ export class PropertyService {
     return this.propertyModel.findByIdAndDelete(id).exec();
   }
 
-  async getMarketLevelDetails(): Promise<any> {
-    return {
-      averagePrice: await this.propertyModel
-        .aggregate([
-          { $group: { _id: null, averagePrice: { $avg: '$price' } } },
-        ])
-        .exec(),
-      propertyCount: await this.propertyModel.countDocuments().exec(),
-    };
-  }
+  async getMarketLevelDetails(low: number, high: number): Promise<any> {
+    if (low < 0 || high < 0) {
+      throw new Error('Price values cannot be negative.');
+    }
+    // Normalize: Ensure low is the smaller value and high is the larger value
+    const normalizedLow = Math.min(low, high);
+    const normalizedHigh = Math.max(low, high);
 
+    return this.propertyModel
+      .find({ price: { $gte: normalizedLow, $lte: normalizedHigh } })
+      .exec();
+  }
   async getNeighborhoodLevelDetails(
     city: string,
     state: string,
     area: string
   ): Promise<any> {
     return this.propertyModel
-      .aggregate([
-        { $match: { city, state, area } },
-        {
-          $group: {
-            _id: { city: '$city', state: '$state', area: '$area' },
-            averagePrice: { $avg: '$price' },
-            propertyCount: { $sum: 1 },
-          },
-        },
-      ])
+      .find({
+        $or: [
+          { city: { $eq: city.toLowerCase() } }, // Exact match for city
+          { state: { $eq: state.toLowerCase() } }, // Exact match for state
+          { area: { $eq: area.toLowerCase() } }, // Exact match for area
+        ],
+      })
       .exec();
   }
 

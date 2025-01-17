@@ -6,7 +6,7 @@ export const addProperty = (propertyData: any) =>
       'Content-Type': 'multipart/form-data',
     },
   });
-const listFilterPropertiesUrl = `${moduleBaseUrl}/list`;
+const listFilterPropertiesUrl = `${moduleBaseUrl}/all`;
 
 export const listAndFilterProperties = (queryParams: string) =>
   api.get(

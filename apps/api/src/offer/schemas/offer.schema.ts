@@ -18,6 +18,9 @@ export class Offer extends Document {
   @Prop({ default: new Date() })
   createdAt: Date;
 
+  @Prop({ required: true })
+  pdfUrl: string; // Field to store the PDF template URL
+
   @Prop({ type: [String], default: [] })
   emailChain: string[];
 }

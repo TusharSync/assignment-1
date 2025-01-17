@@ -36,4 +36,26 @@ export class PropertyListQuery {
     example: 'West End',
   })
   area?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter by marketLevel',
+    example: 'true',
+  })
+  marketLevel?: string;
+  @ApiPropertyOptional({
+    description: 'Filter by neighborhoodLevel',
+    example: 'true',
+  })
+  neighborhoodLevel?: string;
+
+  @ApiPropertyOptional({
+    description: 'Lowest Price',
+    example: 0,
+  })
+  low?: number;
+  @ApiPropertyOptional({
+    description: 'Highest Price',
+    example: 1000,
+  })
+  high?: number;
 }
