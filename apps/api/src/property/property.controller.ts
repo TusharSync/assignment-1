@@ -28,13 +28,17 @@ import { RolesGuard } from '../user/roles.guard';
 import { Roles } from '../user/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PropertyListQuery } from './property.query';
+import { OfferService } from '../offer/offer.service';
 
 @ApiTags('Property') // Groups all routes under the "Property" section in Swagger
 @Controller('property')
 @ApiBearerAuth() // Adds Bearer Authentication to all routes in this controller
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class PropertyController {
-  constructor(private readonly propertyService: PropertyService) {}
+  constructor(
+    private readonly propertyService: PropertyService,
+    private readonly offerService: OfferService
+  ) {}
 
   @Post('create')
   @Roles('admin')
@@ -113,6 +117,63 @@ export class PropertyController {
     return this.propertyService.filterProperties({ ...filters, user });
   }
 
+  @Get(':id/offers')
+  @ApiOperation({ summary: 'Get all offers for a property' })
+  @ApiParam({ name: 'id', description: 'ID of the property' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of offers with user details for the specified property',
+    schema: {
+      example: [
+        {
+          propertyId: 'property123',
+          buyerName: 'John Doe',
+          buyerEmail: 'john@example.com',
+          offerAmount: 500000,
+          createdAt: '2025-01-17T10:00:00.000Z',
+          pdfUrl: 'http://example.com/pdf',
+          emailChain: ['email1', 'email2'],
+        },
+      ],
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Property not found' })
+  async getOffersForProperty(@Param('id') propertyId: string) {
+    return await this.offerService.getOffersByProperty(propertyId);
+  }
+
+  @Get('offer/:id/email-thread')
+  @ApiOperation({ summary: 'Get the entire email thread for a specific offer' })
+  @ApiParam({ name: 'id', description: 'ID of the offer' })
+  @ApiResponse({
+    status: 200,
+    description: 'Email thread for the specified offer',
+    schema: {
+      example: [
+        {
+          messageId: 'message123',
+          offerId: 'offer123',
+          recipient: 'user@example.com',
+          subject: 'Offer Discussion',
+          body: 'Email body content',
+          sentAt: '2025-01-17T10:00:00.000Z',
+          replies: [
+            {
+              messageId: 'reply123',
+              from: 'another@example.com',
+              subject: 'Re: Offer Discussion',
+              body: 'Reply body content',
+              receivedAt: '2025-01-17T12:00:00.000Z',
+            },
+          ],
+        },
+      ],
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Offer not found' })
+  async getEmailThread(@Param('id') offerId: string) {
+    return await this.offerService.getEmailThread(offerId);
+  }
   @Get(':id')
   @ApiOperation({ summary: 'Get a property by ID' })
   @ApiParam({

@@ -14,3 +14,13 @@ export const listAndFilterProperties = (queryParams: string) =>
       ? `${listFilterPropertiesUrl}?${queryParams}`
       : listFilterPropertiesUrl
   );
+
+export const fetchOffersByProperty = (propertyId: string) =>
+  api.get(`${moduleBaseUrl}/${propertyId}/offers`);
+
+export const fetchEmailThreadByOffer = (offerId: string) =>
+  api.get(`${moduleBaseUrl}/offer/${offerId}/email-thread`);
+
+
+export const fetchSinglePropertyById = (propertyId: string) =>
+  api.get(`${moduleBaseUrl}/${propertyId}`);

@@ -16,6 +16,8 @@ import AdminHome from './pages/AdminHomePage';
 import useAuthStore from './store/authStore';
 import { useEffect } from 'react';
 import ProtectedAdminRoute from './Routes/ProtectedAdminRoute';
+import PropertyDetailsPage from './pages/PropertyDetailsPage';
+import EmailThreadPage from './pages/EmailThreadPage';
 
 function App() {
   const { currentUser } = useAuthStore();
@@ -68,6 +70,8 @@ function App() {
             path="/admin"
             element={<ProtectedAdminRoute element={<AdminHome />} />}
           />
+          <Route path="/property/:id" element={<PropertyDetailsPage />} />
+          <Route path="/offer/:id/email-thread" element={<EmailThreadPage />} />
         </Routes>
       </Router>
     </ThemeProvider>

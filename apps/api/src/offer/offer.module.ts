@@ -7,6 +7,7 @@ import { FileService } from '../file/file.service';
 import { QueueService } from './queue.service';
 import { Property, PropertySchema } from '../property/schemas/property.schema';
 import { User, UserSchema } from '../user/schemas/user.schema';
+import { Email, EmailSchema } from '../email/schemas/email.schema';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { User, UserSchema } from '../user/schemas/user.schema';
       { name: Offer.name, schema: OfferSchema },
       { name: Property.name, schema: PropertySchema },
       { name: User.name, schema: UserSchema },
+      { name: Email.name, schema: EmailSchema },
     ]),
     EmailModule,
   ],

@@ -1,5 +1,9 @@
 import { create } from 'zustand';
-import { listAndFilterProperties } from '../services/api/property';
+import {
+  fetchOffersByProperty,
+  fetchSinglePropertyById,
+  listAndFilterProperties,
+} from '../services/api/property';
 
 interface PropertyStore {
   isModalOpen: boolean;
@@ -16,6 +20,7 @@ export const usePropertyStore = create<PropertyStore>((set) => ({
 }));
 
 type Property = {
+  _id: string;
   title: string;
   price: number;
   location: string;
@@ -39,6 +44,9 @@ type Filter = {
 };
 
 type PropertyFetchAndFilterStore = {
+  selectedProperty: Property | null;
+  offers: any[];
+  selectProperty: (propertyId: string) => Promise<void>;
   properties: Property[];
   filters: Filter;
   setFilters: (filters: Filter) => void;
@@ -47,7 +55,9 @@ type PropertyFetchAndFilterStore = {
 };
 
 export const usePropertyFetchAndFilterStore =
-  create<PropertyFetchAndFilterStore>((set,get) => ({
+  create<PropertyFetchAndFilterStore>((set, get) => ({
+    offers: [],
+    selectedProperty: null,
     properties: [],
     filters: {},
     setFilters: (filters) => set({ filters }),
@@ -61,10 +71,15 @@ export const usePropertyFetchAndFilterStore =
             .map(([key, value]) => [key, value.toString()])
         ).toString();
 
-        const {data:response} = await listAndFilterProperties(queryParams);
+        const { data: response } = await listAndFilterProperties(queryParams);
         set({ properties: response.data });
       } catch (error) {
         console.error('Failed to fetch properties:', error);
       }
+    },
+    selectProperty: async (propertyId: string) => {
+      const { data: response } = await fetchOffersByProperty(propertyId);
+      const { data: foundProperty } = await fetchSinglePropertyById(propertyId);
+      set({ selectedProperty: foundProperty.data, offers: response.data });
     },
   }));

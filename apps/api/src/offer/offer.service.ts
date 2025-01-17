@@ -11,6 +11,7 @@ import { FileService } from '../file/file.service';
 import { QueueService } from './queue.service';
 import { EmailService } from '../email/email.service';
 import { User } from '../user/schemas/user.schema';
+import { Email } from '../email/schemas/email.schema';
 interface OfferData {
   buyerName: string;
   propertyId: string;
@@ -27,6 +28,8 @@ export class OfferService implements OnModuleInit {
     @InjectModel(User.name) private userModel: Model<User>,
 
     @InjectModel(Property.name) private propertyModel: Model<Property>,
+    @InjectModel(Email.name) private emailModel: Model<Email>,
+
     private queueService: QueueService,
     private emailService: EmailService,
     private fileService: FileService
@@ -48,6 +51,39 @@ export class OfferService implements OnModuleInit {
       console.log('OfferWorker stopped.');
     }
   }
+
+  // Get all offers for a specific property with user details
+  async getOffersByProperty(propertyId: string) {
+    const offers = await this.offerModel
+      .find({ propertyId })
+      .populate('buyerName buyerEmail') // Assuming buyer details are stored in user schema
+      .exec();
+
+    // You can return more information or tweak the query depending on the structure of your data
+    return offers;
+  }
+
+  // Get the email thread for a specific offer
+  async getEmailThread(offerId: string) {
+    const offer = await this.offerModel.findById(offerId).exec();
+
+    if (!offer) {
+      throw new Error('Offer not found');
+    }
+
+    // Get all emails related to the offer
+    const emails = await this.emailModel
+      .find({ offerId })
+      .populate({
+        path: 'replies',
+        select: '-_id -__v', // Exclude key fields like _id and __v in replies
+      })
+      .select('-_id -__v') // Exclude key fields like _id and __v in emails
+      .exec();
+
+    return emails;
+  }
+
   async uploadTemplatePDF(
     fileName: string,
     buffer: Buffer,

@@ -9,6 +9,7 @@ import { RolesGuard } from '../user/roles.guard';
 import { FileService } from '../file/file.service'; // Import FileService
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { OfferModule } from '../offer/offer.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { memoryStorage } from 'multer';
     ]),
     JwtModule,
     UserModule,
+    OfferModule,
   ],
   controllers: [PropertyController],
   providers: [PropertyService, RolesGuard, FileService], // Include FileService
